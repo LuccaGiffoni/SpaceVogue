@@ -7,6 +7,9 @@ public class ShopkeeperInteraction : MonoBehaviour
 {
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        
+        if (CompareTag("Player"))
+        {
+            WarningSystem.Instance.SendWarning("Press 'T' to talk with the Shopkeeper");
+        }
     }
 }

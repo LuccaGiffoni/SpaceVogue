@@ -5,21 +5,15 @@ using UnityEngine;
 
 public class WarningSystem : MonoBehaviour
 {
-    [HideInInspector] public WarningSystem Instance;
+    public static WarningSystem Instance;
 
     [SerializeField] private TextMeshProUGUI warningText;
     [SerializeField] private GameObject warningObject;
 
     private void Awake()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(Instance);
-        }
+        if(Instance == null) Instance = this;
+        else Destroy(Instance);
     }
 
     public void SendWarning(string warning)

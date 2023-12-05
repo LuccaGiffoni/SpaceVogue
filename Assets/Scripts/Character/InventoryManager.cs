@@ -14,14 +14,6 @@ public class InventoryManager : MonoBehaviour
         inventoryButton.SetActive(true);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            ToggleInventoryMenu();
-        }
-    }
-
     public void ToggleInventoryMenu()
     {
         if (inventoryManager.activeInHierarchy)

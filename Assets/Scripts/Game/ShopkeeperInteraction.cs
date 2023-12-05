@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class ShopkeeperInteraction : MonoBehaviour
 {
+    public static ShopkeeperInteraction Instance;
+
     [Header("Dialogue Settings")]
     [SerializeField] private List<string> dialogueList = new();
     [SerializeField] private TextMeshProUGUI dialogueBoxText;
@@ -22,11 +24,10 @@ public class ShopkeeperInteraction : MonoBehaviour
     [SerializeField] private Outfit newOutfit;
 
     private int dialogueIndex = 0;
-    private bool hasPlayerBought = false;
+    public bool hasPlayerBought = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Collision detected");
         if (collision.CompareTag("Player"))
         {
             WarningSystem.Instance.SendWarning("Press 'T' to talk with the Shopkeeper");
@@ -54,14 +55,20 @@ public class ShopkeeperInteraction : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(Instance);
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T) && WarningSystem.isAbleToAction)
         {
-            if (dialogueBox.activeInHierarchy)
+            if (!hasPlayerBought)
             {
                 dialogueIndex = 0;
-                dialogueBoxText.text = "";
+                dialogueBox.SetActive(true);
 
                 foreach (var button in confirmationButtons)
                 {
@@ -72,33 +79,14 @@ public class ShopkeeperInteraction : MonoBehaviour
                 {
                     button.gameObject.SetActive(false);
                 }
+
+                TypeText();
             }
             else
             {
-                if (!hasPlayerBought)
-                {
-                    dialogueIndex = 0;
-                    dialogueBox.SetActive(true);
-
-                    foreach (var button in confirmationButtons)
-                    {
-                        button.gameObject.SetActive(true);
-                    }
-
-                    foreach (var button in buyingButtons)
-                    {
-                        button.gameObject.SetActive(false);
-                    }
-
-                    TypeText();
-                }
-                else
-                {
-                    Debug.Log("Player has already bought this item!");
-                    dialogueIndex = 4;
-
-                    TypeText();
-                }
+                dialogueIndex = 4;
+                dialogueBox.SetActive(true);
+                TypeText();
             }
         }
     }
@@ -117,6 +105,18 @@ public class ShopkeeperInteraction : MonoBehaviour
             foreach (var button in buyingButtons)
             {
                 button.gameObject.SetActive(true);
+            }
+        }
+        else if (hasPlayerBought)
+        {
+            foreach (var button in confirmationButtons)
+            {
+                button.gameObject.SetActive(false);
+            }
+
+            foreach (var button in buyingButtons)
+            {
+                button.gameObject.SetActive(false);
             }
         }
     }

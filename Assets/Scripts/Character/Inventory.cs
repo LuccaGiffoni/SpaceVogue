@@ -16,7 +16,7 @@ public class Inventory : MonoBehaviour
     [SerializeField] private SpriteRenderer outfitSprite;
 
     [Header("Inventory")]
-    [SerializeField] private List<Button> buttons = new();
+    [SerializeField] private List<GameObject> buttons = new();
     [SerializeField] private TextMeshProUGUI currencyText;
 
     [Header("Player")]
@@ -34,12 +34,13 @@ public class Inventory : MonoBehaviour
         outfitsList.Clear();
         outfitSprite.sprite = actualOutfit.OutfitSprite;
         currencyText.text = currency.ToString();
+        outfitsList.Add(actualOutfit);
 
         foreach(var button in buttons)
         {
             for(var i = 1; i < outfitsList.Count; i++)
             {
-                button.gameObject.SetActive(true);
+                button.SetActive(true);
             }
         }
     }
@@ -63,7 +64,7 @@ public class Inventory : MonoBehaviour
             {
                 for (var i = 0; i < outfitsList.Count; i++)
                 {
-                    button.gameObject.SetActive(true);
+                    button.SetActive(true);
                 }
             }
 
@@ -71,9 +72,19 @@ public class Inventory : MonoBehaviour
         }
         else
         {
-            //WarningSystem.Instance.SendMessage("Not enough money to buy it!");
-
             return false;
         }
+    }
+
+    public void SeelOneOutfit(Outfit soldOutfit)
+    {
+        currency += soldOutfit.Price;
+        currencyText.text = currency.ToString();
+        var outfitToRemove = outfitsList.Find(x => x.OutfitIndex == soldOutfit.OutfitIndex);
+        buttons[soldOutfit.OutfitIndex].SetActive(false);
+        outfitsList.Remove(outfitToRemove);
+        ShopkeeperInteraction.Instance.hasPlayerBought = false;
+        animator.runtimeAnimatorController = outfitsList[0].OutfitAnimator;
+        outfitSprite.sprite = outfitsList[0].OutfitSprite;
     }
 }

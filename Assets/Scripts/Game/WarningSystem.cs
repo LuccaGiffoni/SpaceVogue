@@ -6,6 +6,7 @@ using UnityEngine;
 public class WarningSystem : MonoBehaviour
 {
     public static WarningSystem Instance;
+    public static bool isAbleToAction = false;
 
     [SerializeField] private TextMeshProUGUI warningText;
     [SerializeField] private GameObject warningObject;
@@ -25,10 +26,12 @@ public class WarningSystem : MonoBehaviour
     private IEnumerator LogWarningToUser()
     {
         warningObject.SetActive(true);
+        isAbleToAction = true;
 
         yield return new WaitForSeconds(3);
 
         warningObject.SetActive(false);
+        isAbleToAction = false;
 
         yield return null;
     }

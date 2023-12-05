@@ -1,17 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
     public static Inventory Instance;
 
-    [SerializeField] private AnimatorController Outfit;
+    [Header("Itens")]
+    [SerializeField] public Outfit actualOutfit;
+    [SerializeField] private List<Outfit> outfitsList;
+    [SerializeField] private SpriteRenderer outfitSprite;
 
-    public float Currency {  get; private set; }
-    public List<AnimatorController> Outfits { get; private set; } = new();
+    [Header("Inventory")]
+    [SerializeField] private List<Button> buttons = new();
+    [SerializeField] private TextMeshProUGUI currencyText;
+
+    [Header("Player")]
+    [SerializeField] private float currency;
+    [SerializeField] private Animator animator;
 
     private void Awake()
     {
@@ -21,24 +31,49 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        Outfits.Clear();
-        if(Outfit != null) Outfits.Add(Outfit);
-    }
+        outfitsList.Clear();
+        outfitSprite.sprite = actualOutfit.OutfitSprite;
+        currencyText.text = currency.ToString();
 
-    public void ChangeOutfit(AnimatorController newOutfit)
-    {
-        Outfit = newOutfit;
-    }
-
-    public void BuyNewOutfit(AnimatorController newOutfit, float price)
-    {
-        if (Currency - price >= 0)
+        foreach(var button in buttons)
         {
-            Outfits.Add(newOutfit);
+            for(var i = 1; i < outfitsList.Count; i++)
+            {
+                button.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    public void ChangeOutfit(Outfit newOutfit)
+    {
+        actualOutfit = newOutfit;
+        animator.runtimeAnimatorController = newOutfit.OutfitAnimator;
+        outfitSprite.sprite = newOutfit.OutfitSprite;
+    }
+
+    public bool BuyNewOutfit(Outfit newOutfit)
+    {
+        if (currency - newOutfit.Price >= 0)
+        {
+            currency -= newOutfit.Price;
+            outfitsList.Add(newOutfit);
+            currencyText.text = currency.ToString();
+
+            foreach (var button in buttons)
+            {
+                for (var i = 0; i < outfitsList.Count; i++)
+                {
+                    button.gameObject.SetActive(true);
+                }
+            }
+
+            return true;
         }
         else
         {
-            WarningSystem.Instance.SendMessage("Not enough money to buy it!");
+            //WarningSystem.Instance.SendMessage("Not enough money to buy it!");
+
+            return false;
         }
     }
 }
